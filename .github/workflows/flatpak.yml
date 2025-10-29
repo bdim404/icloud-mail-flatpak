@@ -11,18 +11,28 @@ on:
 jobs:
   build:
     name: Build Flatpak (${{ matrix.arch }})
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-23.08
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
       options: --privileged
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64, aarch64]
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up QEMU for cross-compilation
+        if: matrix.arch == 'aarch64'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -39,23 +49,16 @@ jobs:
         run: |
           python3 -m flatpak_node_generator npm package-lock.json -o generated-sources.json
 
-      - name: Set up QEMU for cross-compilation
-        if: matrix.arch == 'aarch64'
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
-
-      - name: Install Flatpak dependencies
-        run: |
-          flatpak install -y flathub org.electronjs.Electron2.BaseApp//23.08
-
       - name: Build Flatpak
-        uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: iCloudMail-${{ matrix.arch }}.flatpak
           manifest-path: moe.bdim.iCloudMail.json
           arch: ${{ matrix.arch }}
-          cache-key: flatpak-builder-${{ matrix.arch }}-${{ hashFiles('**/package-lock.json') }}
+          cache: true
+          repository-name: flathub
+          repository-url: https://flathub.org/repo/flathub.flatpakrepo
+          upload-artifact: false
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
