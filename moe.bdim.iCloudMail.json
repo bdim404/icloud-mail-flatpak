@@ -36,7 +36,9 @@
         }
       },
       "build-commands": [
-        "npm ci --offline --legacy-peer-deps",
+        "npm ci --offline --legacy-peer-deps --ignore-scripts",
+        "unzip -q flatpak-node/cache/electron/electron-v30.0.1-linux-$(uname -m | sed 's/x86_64/x64/;s/aarch64/arm64/').zip -d node_modules/electron/dist",
+        "chmod +x node_modules/electron/dist/electron",
         "install -d /app/icloud-mail",
         "cp -ra . /app/icloud-mail/",
         "install -Dm644 icon.png /app/share/icons/hicolor/256x256/apps/moe.bdim.iCloudMail.png",
@@ -79,7 +81,7 @@
           "dest-filename": "icloud-mail.sh",
           "commands": [
             "export TMPDIR=\"$XDG_RUNTIME_DIR/app/$FLATPAK_ID\"",
-            "exec zypak-wrapper.sh /app/icloud-mail/node_modules/electron/dist/electron /app/icloud-mail \"$@\""
+            "exec zypak-wrapper.sh /app/icloud-mail/node_modules/electron/dist/electron /app/icloud-mail/main.js \"$@\""
           ]
         }
       ]
