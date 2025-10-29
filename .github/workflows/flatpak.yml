@@ -26,18 +26,15 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
+      - name: Install flatpak-node-generator
         run: |
-          sudo apt-get update
-          sudo apt-get install -y python3 python3-pip
-
-      - name: Install flatpak-builder-tools
-        run: |
-          git clone https://github.com/flatpak/flatpak-builder-tools.git /tmp/flatpak-builder-tools
+          python3 -m pip install --upgrade pip
+          python3 -m pip install aiohttp toml
+          python3 -m pip install git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=node
 
       - name: Generate generated-sources.json
         run: |
-          python3 /tmp/flatpak-builder-tools/node/flatpak-node-generator.py npm package-lock.json -o generated-sources.json
+          python3 -m flatpak_node_generator npm package-lock.json -o generated-sources.json
 
       - name: Set up QEMU for cross-compilation
         if: matrix.arch == 'aarch64'
