@@ -57,50 +57,42 @@ jobs:
 
   build-aarch64:
     name: Build Flatpak (aarch64)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
+      options: --privileged
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install dependencies
+      - name: Install flatpak-node-generator
         run: |
-          npm ci --legacy-peer-deps
+          python3 -m pip install --upgrade pip
+          python3 -m pip install aiohttp toml
+          python3 -m pip install git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=node
 
-      - name: Build Flatpak in container
+      - name: Generate generated-sources.json
         run: |
-          docker run --rm --privileged \
-            --security-opt seccomp=unconfined \
-            --security-opt apparmor=unconfined \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            --platform linux/arm64 \
-            ghcr.io/flathub-infra/flatpak-github-actions:gnome-48 \
-            flatpak-builder --arch=aarch64 --repo=repo --force-clean \
-            --install-deps-from=flathub --disable-rofiles-fuse \
-            build-dir moe.bdim.iCloudMail.aarch64.json
+          python3 -m flatpak_node_generator npm package-lock.json -o generated-sources.json
 
-          docker run --rm --privileged \
-            --security-opt seccomp=unconfined \
-            --security-opt apparmor=unconfined \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            --platform linux/arm64 \
-            ghcr.io/flathub-infra/flatpak-github-actions:gnome-48 \
-            flatpak build-bundle repo iCloudMail-aarch64.flatpak moe.bdim.iCloudMail
+      - name: Build Flatpak
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: iCloudMail-aarch64.flatpak
+          manifest-path: moe.bdim.iCloudMail.json
+          arch: aarch64
+          cache: true
+          repository-name: flathub
+          repository-url: https://flathub.org/repo/flathub.flatpakrepo
+          upload-artifact: false
+        env:
+          FLATPAK_BUILDER_ALLOW_MISSING_RUNTIMES: "1"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
