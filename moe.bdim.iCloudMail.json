@@ -24,6 +24,7 @@
       "name": "icloud-mail",
       "buildsystem": "simple",
       "build-commands": [
+        "npm install --offline --cache=flatpak-node/npm-cache",
         "install -d /app/icloud-mail",
         "cp -ra . /app/icloud-mail/",
         "install -Dm644 icon.png /app/share/icons/hicolor/256x256/apps/moe.bdim.iCloudMail.png",
@@ -33,8 +34,33 @@
       ],
       "sources": [
         {
-          "type": "dir",
-          "path": "."
+          "type": "file",
+          "path": "package.json"
+        },
+        {
+          "type": "file",
+          "path": "package-lock.json"
+        },
+        "generated-sources.json",
+        {
+          "type": "file",
+          "path": "main.js"
+        },
+        {
+          "type": "file",
+          "path": "preload.js"
+        },
+        {
+          "type": "file",
+          "path": "icon.png"
+        },
+        {
+          "type": "file",
+          "path": "moe.bdim.iCloudMail.desktop"
+        },
+        {
+          "type": "file",
+          "path": "moe.bdim.iCloudMail.metainfo.xml"
         },
         {
           "type": "script",

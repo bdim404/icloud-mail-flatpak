@@ -1,0 +1,102 @@
+name: Build and Release Flatpak
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Flatpak (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, aarch64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 python3-pip
+
+      - name: Install flatpak-builder-tools
+        run: |
+          git clone https://github.com/flatpak/flatpak-builder-tools.git /tmp/flatpak-builder-tools
+
+      - name: Generate generated-sources.json
+        run: |
+          python3 /tmp/flatpak-builder-tools/node/flatpak-node-generator.py npm package-lock.json -o generated-sources.json
+
+      - name: Set up QEMU for cross-compilation
+        if: matrix.arch == 'aarch64'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build Flatpak
+        uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        with:
+          bundle: iCloudMail-${{ matrix.arch }}.flatpak
+          manifest-path: moe.bdim.iCloudMail.json
+          arch: ${{ matrix.arch }}
+          cache-key: flatpak-builder-${{ matrix.arch }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: iCloudMail-flatpak-${{ matrix.arch }}
+          path: iCloudMail-${{ matrix.arch }}.flatpak
+          retention-days: 90
+
+  release:
+    name: Create GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display structure
+        run: ls -R artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*.flatpak
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            ## iCloud Mail Flatpak Release
+
+            Download the appropriate flatpak for your architecture:
+            - `iCloudMail-x86_64.flatpak` - for Intel/AMD 64-bit systems
+            - `iCloudMail-aarch64.flatpak` - for ARM64 systems
+
+            ### Installation
+            ```bash
+            flatpak install --user iCloudMail-x86_64.flatpak
+            ```
+
+            ### Running
+            ```bash
+            flatpak run moe.bdim.iCloudMail
+            ```
