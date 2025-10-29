@@ -29,7 +29,10 @@
       "build-options": {
         "append-path": "/usr/lib/sdk/node20/bin",
         "env": {
-          "NPM_CONFIG_LOGLEVEL": "info"
+          "NPM_CONFIG_LOGLEVEL": "info",
+          "npm_config_cache": "flatpak-node/npm-cache",
+          "npm_config_offline": "true",
+          "ELECTRON_SKIP_BINARY_DOWNLOAD": "1"
         }
       },
       "build-commands": [
