@@ -35,15 +35,6 @@
     <content_attribute id="social-info">moderate</content_attribute>
   </content_rating>
 
-  <releases>
-    <release version="1.2.0" date="2024-04-30">
-      <description>
-        <p>Big update:</p>
-        <ul>
-          <li>Updated Rendering Engine from Chrome version 121 to 124</li>
-        </ul>
-      </description>
-    </release>
     <release version="1.0.0" date="2025-10-29">
       <description>
         <p>Initial release</p>
