@@ -89,6 +89,8 @@ jobs:
       - name: Build Flatpak in container
         run: |
           docker run --rm --privileged \
+            --security-opt seccomp=unconfined \
+            --security-opt apparmor=unconfined \
             -v ${{ github.workspace }}:/workspace \
             -w /workspace \
             --platform linux/arm64 \
@@ -98,6 +100,8 @@ jobs:
             build-dir moe.bdim.iCloudMail.json
 
           docker run --rm --privileged \
+            --security-opt seccomp=unconfined \
+            --security-opt apparmor=unconfined \
             -v ${{ github.workspace }}:/workspace \
             -w /workspace \
             --platform linux/arm64 \
