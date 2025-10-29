@@ -3,6 +3,9 @@
   "runtime": "org.freedesktop.Platform",
   "runtime-version": "23.08",
   "sdk": "org.freedesktop.Sdk",
+  "sdk-extensions": [
+    "org.freedesktop.Sdk.Extension.node20"
+  ],
   "base": "org.electronjs.Electron2.BaseApp",
   "base-version": "23.08",
   "command": "icloud-mail",
@@ -23,7 +26,14 @@
     {
       "name": "icloud-mail",
       "buildsystem": "simple",
+      "build-options": {
+        "append-path": "/usr/lib/sdk/node20/bin",
+        "env": {
+          "NPM_CONFIG_LOGLEVEL": "info"
+        }
+      },
       "build-commands": [
+        "npm ci --offline --legacy-peer-deps",
         "install -d /app/icloud-mail",
         "cp -ra . /app/icloud-mail/",
         "install -Dm644 icon.png /app/share/icons/hicolor/256x256/apps/moe.bdim.iCloudMail.png",

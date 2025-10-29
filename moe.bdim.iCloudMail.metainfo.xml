@@ -22,7 +22,8 @@
 
   <screenshots>
     <screenshot type="default">
-      <caption>iCloud Mail main window</caption>
+      <image>https://raw.githubusercontent.com/bdim/icloud-mail-flatpak/main/screenshot.jpg</image>
+      <caption>iCloud Mail sign in page</caption>
     </screenshot>
   </screenshots>
 
@@ -35,6 +36,7 @@
     <content_attribute id="social-info">moderate</content_attribute>
   </content_rating>
 
+  <releases>
     <release version="1.0.0" date="2025-10-29">
       <description>
         <p>Initial release</p>
