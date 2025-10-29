@@ -27,7 +27,8 @@
       "name": "icloud-mail",
       "buildsystem": "simple",
       "build-options": {
-        "append-path": "/usr/lib/sdk/node20/bin"
+        "append-path": "/usr/lib/sdk/node20/bin",
+        "no-build-isolation": true
       },
       "build-commands": [
         "install -d /app/icloud-mail",
