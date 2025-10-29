@@ -94,7 +94,7 @@ jobs:
             --platform linux/arm64 \
             ghcr.io/flathub-infra/flatpak-github-actions:gnome-48 \
             flatpak-builder --arch=aarch64 --repo=repo --force-clean \
-            --install-deps-from=flathub --disable-rofiles-fuse \
+            --install-deps-from=flathub --disable-rofiles-fuse --disable-sandbox \
             build-dir moe.bdim.iCloudMail.json
 
           docker run --rm --privileged \
