@@ -56,3 +56,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Disclaimer
 
 This is an unofficial application and is not affiliated with, endorsed by, or associated with Apple Inc. iCloud and iCloud Mail are trademarks of Apple Inc.
+
+## Thanks
+
+Thanks to https://github.com/Swe-HimelRana/icloud-mail
